@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './layouts/Layout';
 import Home from './pages/Home';
+import Watchlist from './pages/Watchlist';
 import './index.css';
 
 const queryClient = new QueryClient();
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="watchlist" element={<Watchlist />} />
           </Route>
         </Routes>
       </BrowserRouter>
