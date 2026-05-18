@@ -1,0 +1,15 @@
+# Default owners for everything in the repo.
+# Replace with team handles once more than one engineer is on the project.
+*                @dpbasan
+
+# Architectural decisions deserve explicit review.
+/docs/adr/       @dpbasan
+
+# Backend
+/backend/        @dpbasan
+
+# Frontend
+/frontend/       @dpbasan
+
+# CI / repo plumbing
+/.github/        @dpbasan
