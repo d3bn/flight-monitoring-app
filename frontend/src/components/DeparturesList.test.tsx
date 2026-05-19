@@ -38,7 +38,7 @@ function mockQuery(overrides: object) {
 }
 
 describe('DeparturesList', () => {
-  afterEach(() => vi.clearAllMocks());
+  afterEach(() => { vi.clearAllMocks(); });
 
   it('shows skeleton rows while loading', () => {
     mockQuery({ isLoading: true });
