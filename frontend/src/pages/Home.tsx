@@ -1,27 +1,26 @@
-import { useQuery } from '@tanstack/react-query';
-import apiClient from '../lib/axios';
-
-function useHealthCheck() {
-  return useQuery({
-    queryKey: ['health'],
-    queryFn: () => apiClient.get('/health').then((r) => r.data),
-  });
-}
+import { useState } from 'react';
+import AirportSearch from '../components/AirportSearch';
+import DeparturesList from '../components/DeparturesList';
 
 export default function Home() {
-  const { data, isLoading, isError } = useHealthCheck();
+  const [airport, setAirport] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col items-center gap-6 mt-16">
-      <h1 className="text-3xl font-bold">Flight Disruption Monitor</h1>
-      <div className="card bg-base-200 w-80 shadow">
-        <div className="card-body items-center text-center">
-          <h2 className="card-title">API Status</h2>
-          {isLoading && <span className="loading loading-spinner" />}
-          {isError && <span className="badge badge-error">Unreachable</span>}
-          {data && <span className="badge badge-success">{data.status}</span>}
+    <div className="container mx-auto px-4 py-10 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-2">
+        Flight Disruption Monitor
+      </h1>
+      <p className="text-center text-base-content/60 mb-8">
+        Enter an airport code to view upcoming departures
+      </p>
+
+      <AirportSearch onSearch={setAirport} />
+
+      {airport && (
+        <div className="mt-8">
+          <DeparturesList airport={airport} />
         </div>
-      </div>
+      )}
     </div>
   );
 }
