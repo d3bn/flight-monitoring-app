@@ -1,4 +1,4 @@
-# Flight Disruption Monitoring System (Testing)
+# Flight Disruption Monitoring System
 
 A full-stack application for monitoring live flight departures, tracking disruption events, and managing a personal flight watchlist.
 
