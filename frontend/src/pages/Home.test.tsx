@@ -1,47 +1,55 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import Home from './Home';
+import * as useDeparturesModule from '../hooks/useDepartures';
 
-vi.mock('../lib/axios', () => ({
-  default: { get: vi.fn() },
-}));
-
-import apiClient from '../lib/axios';
+vi.mock('../hooks/useDepartures');
+const mockUseDepartures = vi.mocked(useDeparturesModule.useDepartures);
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider
-      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
-    >
+    <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>{children}</MemoryRouter>
     </QueryClientProvider>
   );
 }
 
 describe('Home', () => {
+  beforeEach(() => {
+    mockUseDepartures.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+      dataUpdatedAt: 0,
+    } as any);
+  });
+
+  afterEach(() => { vi.clearAllMocks(); });
+
   it('renders the page heading', () => {
-    vi.mocked(apiClient.get).mockResolvedValue({ data: { status: 'ok' } });
     render(<Home />, { wrapper });
     expect(screen.getByText('Flight Disruption Monitor')).toBeInTheDocument();
   });
 
-  it('shows a loading spinner while the health request is in flight', () => {
-    vi.mocked(apiClient.get).mockReturnValue(new Promise(() => {}));
+  it('renders the airport search input', () => {
     render(<Home />, { wrapper });
-    expect(document.querySelector('.loading')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument();
   });
 
-  it('shows the API status badge on success', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue({ data: { status: 'ok' } });
+  it('does not show departures list before a search is submitted', () => {
     render(<Home />, { wrapper });
-    expect(await screen.findByText('ok')).toBeInTheDocument();
+    expect(screen.queryByText(/Departures from/i)).not.toBeInTheDocument();
   });
 
-  it('shows Unreachable badge when the API call fails', async () => {
-    vi.mocked(apiClient.get).mockRejectedValue(new Error('Network error'));
+  it('shows the departures list after a valid airport code is searched', async () => {
     render(<Home />, { wrapper });
-    expect(await screen.findByText('Unreachable')).toBeInTheDocument();
+    await userEvent.type(screen.getByRole('textbox'), 'SYD');
+    await userEvent.click(screen.getByRole('button', { name: /search/i }));
+    expect(screen.getByText(/Departures from/i)).toBeInTheDocument();
   });
 });

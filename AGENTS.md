@@ -28,6 +28,41 @@ Repeat for each sub-task before moving to the next.
 
 ---
 
+## PR Title Format
+
+PR titles must include the Jira key in **uppercase** so the auto-transition workflow can extract it:
+
+```
+<type>(PRAG-<n>): <short description>
+```
+
+**Example:** `feat(PRAG-71): add Hello World endpoint at GET /hello`
+
+Multiple keys (multi-ticket PRs) are supported — include each key separated by `+`:
+`feat(PRAG-15+PRAG-16): departures list and UI states`
+
+---
+
+## Jira Auto-Transition on PR Merge
+
+`.github/workflows/jira-transition.yml` automatically moves Jira tickets to **QA** when a PR is merged into `main`.
+
+**How it works:**
+1. PR is merged → workflow triggers
+2. Regex extracts all `PRAG-NNN` keys from the PR title
+3. Calls Jira REST API to transition each ticket → **QA** (transition ID `3`)
+4. Posts a comment on each ticket linking to the merged PR
+
+**Required GitHub Secrets** (set once in repo Settings → Secrets → Actions):
+
+| Secret | Value |
+|--------|-------|
+| `JIRA_BASE_URL` | `https://dpbasan.atlassian.net` |
+| `JIRA_USER_EMAIL` | your Atlassian account email |
+| `JIRA_API_TOKEN` | API token from [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
+
+---
+
 ## Workflow — Per Story / Task
 
 - Move the **parent story/task** to `In Progress` (`21`) when its **first sub-task** starts
@@ -38,10 +73,10 @@ Repeat for each sub-task before moving to the next.
 
 ## Git Commit Format
 
-One commit per sub-task, using conventional commits scoped to the Jira ticket key:
+One commit per sub-task, using conventional commits scoped to the Jira ticket key (**uppercase**):
 
 ```
-<type>(prag-<n>): <short description>
+<type>(PRAG-<n>): <short description>
 
 <body — what changed and why, bullet points if multiple files>
 
@@ -52,7 +87,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
 **Example:**
 ```
-feat(prag-13): add AeroDataBox departures integration and endpoint
+feat(PRAG-13): add AeroDataBox departures integration and endpoint
 
 - GET /flights/departures?airport=SYD proxies AeroDataBox API
 - DeparturesService handles HTTP + error mapping
